@@ -22,12 +22,24 @@ namespace OrleansMessenger.Client
                 .SubscribeAsync(new IncommingMessageObserver())
                 .Result;
 
+            foreach (var message in userGrain.GetHistoricalMessages(10).Result)
+            {
+                Console.WriteLine(message);
+            }
+
             var command = "";
             while (true)
             {
                 command = Console.ReadLine();
 
                 if (command == "q") break;
+                if (command == "h")
+                {
+                    foreach (var message in userGrain.GetHistoricalMessages().Result)
+                    {
+                        Console.WriteLine(message);
+                    }
+                }
                 if (command.StartsWith("s"))
                 {
                     var commandArgs = command.Split(':');

@@ -26,6 +26,7 @@ namespace OrleansMessenger.GrainInterfaces
     using System.Collections.Generic;
     using Orleans;
     using Orleans.Runtime;
+    using System.Collections;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Orleans-CodeGenerator", "1.0.10.0")]
@@ -122,6 +123,12 @@ namespace OrleansMessenger.GrainInterfaces
 
                 return base.InvokeMethodAsync<object>(-849914411, new object[] {@message, @from} );
             }
+            
+            System.Threading.Tasks.Task<string[]> OrleansMessenger.GrainInterfaces.IUserGrain.GetHistoricalMessages(int @count)
+            {
+
+                return base.InvokeMethodAsync<System.String[]>(-2134226323, new object[] {@count} );
+            }
         }
     }
     
@@ -153,6 +160,8 @@ namespace OrleansMessenger.GrainInterfaces
                                 return ((IUserGrain)grain).SendMessage((System.String)arguments[0], (System.String)arguments[1]).ContinueWith(t => {if (t.Status == System.Threading.Tasks.TaskStatus.Faulted) throw t.Exception; return (object)null; });
                             case -849914411: 
                                 return ((IUserGrain)grain).ReceiveMessage((System.String)arguments[0], (System.String)arguments[1]).ContinueWith(t => {if (t.Status == System.Threading.Tasks.TaskStatus.Faulted) throw t.Exception; return (object)null; });
+                            case -2134226323: 
+                                return ((IUserGrain)grain).GetHistoricalMessages((System.Int32)arguments[0]).ContinueWith(t => {if (t.Status == System.Threading.Tasks.TaskStatus.Faulted) throw t.Exception; return (object)t.Result; });
                             default: 
                             throw new NotImplementedException("interfaceId="+interfaceId+",methodId="+methodId);
                         }case -1277021679:  // IGrainWithStringKey
@@ -186,6 +195,8 @@ namespace OrleansMessenger.GrainInterfaces
                             return "SendMessage";
                     case -849914411:
                             return "ReceiveMessage";
+                    case -2134226323:
+                            return "GetHistoricalMessages";
                     
                         default: 
                             throw new NotImplementedException("interfaceId="+interfaceId+",methodId="+methodId);

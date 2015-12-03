@@ -7,5 +7,6 @@ namespace OrleansMessenger.GrainInterfaces
     {
         Task SendMessage(string message, string to);
         Task ReceiveMessage(string message, string from);
+        Task<string[]> GetHistoricalMessages(int count = int.MaxValue);
     }
 }

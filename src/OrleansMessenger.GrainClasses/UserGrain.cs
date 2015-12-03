@@ -1,12 +1,16 @@
-using System;
-using System.Threading.Tasks;
 using Orleans;
+using Orleans.Providers;
 using Orleans.Streams;
 using OrleansMessenger.GrainInterfaces;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OrleansMessenger.GrainClasses
 {
-    public class UserGrain : Grain, IUserGrain
+    [StorageProvider(ProviderName = "UserGrainStore")]
+    public class UserGrain : Grain<UserState>, IUserGrain
     {
         private IAsyncStream<string> _clientMessageStream;
 
@@ -19,14 +23,23 @@ namespace OrleansMessenger.GrainClasses
 
         public async Task ReceiveMessage(string message, string from)
         {
-            Console.WriteLine("Reveive message");
-            await _clientMessageStream.OnNextAsync(string.Format("m:{0}:{1}", from, message));
+            var command = string.Format("m:{0}:{1}", from, message);
+            State.History.Add(command);
+            await WriteStateAsync();
+            await _clientMessageStream.OnNextAsync(command);
         }
 
         public async Task SendMessage(string message, string to)
         {
-            Console.WriteLine("Send Message");
-            await GrainFactory.GetGrain<IUserGrain>(to).ReceiveMessage(message, this.GetPrimaryKeyString());            
+            State.History.Add(string.Format("s:{0}:{1}", to, message));
+            await WriteStateAsync();
+            await GrainFactory.GetGrain<IUserGrain>(to)
+                .ReceiveMessage(message, this.GetPrimaryKeyString());
+        }
+
+        public Task<string[]> GetHistoricalMessages(int count = int.MaxValue)
+        {
+            return Task.FromResult(State.History.Skip(Math.Max(0, State.History.Count - count)).ToArray());
         }
     }
 }
