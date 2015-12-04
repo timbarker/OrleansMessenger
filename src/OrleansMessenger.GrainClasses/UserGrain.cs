@@ -4,12 +4,13 @@ using Orleans.Streams;
 using OrleansMessenger.GrainInterfaces;
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 
 namespace OrleansMessenger.GrainClasses
 {
     [StorageProvider(ProviderName = "UserGrainStore")]
+    [Reentrant]
     public class UserGrain : Grain<UserState>, IUserGrain
     {
         private IAsyncStream<string> _clientMessageStream;

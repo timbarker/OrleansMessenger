@@ -3,7 +3,8 @@
   <Globals>
     <StorageProviders>
       <Provider Type="Orleans.Storage.MemoryStorage" Name="PubSubStore" NumStorageGrains="1"/>
-      <Provider Type="Orleans.Storage.MemoryStorage" Name="UserGrainStore" />     
+      <Provider Type="Orleans.Storage.MemoryStorage" Name="UserGrainStore" />
+      <!-- <Provider Type="OrleansMessenger.RedisStorage" Name="UserGrainStore" RedisConnectionString="localhost" /> -->
     </StorageProviders>
     <StreamProviders>
       <Provider Type="Orleans.Providers.Streams.SimpleMessageStream.SimpleMessageStreamProvider" Name="SMSProvider" FireAndForgetDelivery="false"/>
