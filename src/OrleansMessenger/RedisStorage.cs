@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Orleans;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
 using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace OrleansMessenger
 {
@@ -27,31 +27,28 @@ namespace OrleansMessenger
         public async Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
             Name = name;
+            Log = providerRuntime.GetLogger("OrleansMessenger.RedisStorage." + _serviceId);
             _serviceId = providerRuntime.ServiceId.ToString();
 
-            if (!config.Properties.ContainsKey("RedisConnectionString") ||
-                string.IsNullOrWhiteSpace(config.Properties["RedisConnectionString"]))
+            if (!config.Properties.ContainsKey("ConnectionString"))
             {
-                throw new ArgumentException("RedisConnectionString is not set.");
+                throw new ArgumentException("ConnectionString is not set");
             }
-            var connectionString = config.Properties["RedisConnectionString"];
 
-            _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(connectionString);
+            _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(config.Properties["ConnectionString"]);
 
-            if (!config.Properties.ContainsKey("DatabaseNumber") ||
-                string.IsNullOrWhiteSpace(config.Properties["DatabaseNumber"]))
+            int databaseNumber = 0;
+            if (config.Properties.ContainsKey("DatabaseNumber") &&
+                int.TryParse(config.Properties["DatabaseNumber"], out databaseNumber))
             {
-                _redisDatabase = _connectionMultiplexer.GetDatabase();
+                _redisDatabase = _connectionMultiplexer.GetDatabase(databaseNumber);
             }
             else
             {
-                var databaseNumber = Convert.ToInt16(config.Properties["DatabaseNumber"]);
-                _redisDatabase = _connectionMultiplexer.GetDatabase(databaseNumber);
+                _redisDatabase = _connectionMultiplexer.GetDatabase();
             }
 
-            Log = providerRuntime.GetLogger("StorageProvider.RedisStorage." + _serviceId);
-
-            _serialiser = JsonSerializer.Create(new JsonSerializerSettings() {TypeNameHandling = TypeNameHandling.All});
+            _serialiser = JsonSerializer.Create(new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Arrays });
         }
 
         public Task Close()
@@ -72,8 +69,6 @@ namespace OrleansMessenger
             }
 
             grainState.SetAll(data);
-
-            grainState.Etag = Guid.NewGuid().ToString();
         }
 
         public async Task WriteStateAsync(string grainType, GrainReference grainReference, GrainState grainState)
