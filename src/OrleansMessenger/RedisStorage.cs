@@ -27,8 +27,8 @@ namespace OrleansMessenger
         public async Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
             Name = name;
-            Log = providerRuntime.GetLogger("OrleansMessenger.RedisStorage." + _serviceId);
             _serviceId = providerRuntime.ServiceId.ToString();
+            Log = providerRuntime.GetLogger("OrleansMessenger.RedisStorage." + _serviceId);
 
             if (!config.Properties.ContainsKey("ConnectionString"))
             {

@@ -40,7 +40,7 @@ namespace OrleansMessenger.Client
                         Console.WriteLine(message);
                     }
                 }
-                if (command.StartsWith("s"))
+                if (command.StartsWith("s", StringComparison.Ordinal))
                 {
                     var commandArgs = command.Split(':');
                     userGrain.SendMessage(commandArgs[2], commandArgs[1]);
