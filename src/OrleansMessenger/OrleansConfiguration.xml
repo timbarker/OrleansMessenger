@@ -10,6 +10,9 @@
     </StreamProviders>
     <SeedNode Address="localhost" Port="22222"/>
     <Messaging ResponseTimeout="30s"/>
+    <LogConsistencyProviders>
+      <Provider Type="Orleans.EventSourcing.LogStorage.LogConsistencyProvider" Name="LogStorage" />
+    </LogConsistencyProviders>
   </Globals>
   <Defaults>
     <Networking Address="localhost" Port="22222"/>

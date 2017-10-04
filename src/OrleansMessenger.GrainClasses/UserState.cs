@@ -10,5 +10,15 @@ namespace OrleansMessenger.GrainClasses
         {
             History = new List<string>();
         }
+
+        public void Apply(MessageReceived @event)
+        {
+            History.Add($"{@event.From}: {@event.Message}");
+        }
+
+        public void Apply(MessageSent @event)
+        {
+            History.Add($"{@event.To}: {@event.Message}");
+        }
     }
 }
