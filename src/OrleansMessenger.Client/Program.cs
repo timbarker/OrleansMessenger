@@ -56,18 +56,18 @@ namespace OrleansMessenger.Client
         {
             public Task OnCompletedAsync()
             {
-                return TaskDone.Done;
+                return Task.CompletedTask;
             }
 
             public Task OnErrorAsync(Exception ex)
             {
-                return TaskDone.Done;
+                return Task.CompletedTask;
             }
 
             public Task OnNextAsync(string message, StreamSequenceToken token = null)
             {
                 Console.WriteLine(message);
-                return TaskDone.Done;
+                return Task.CompletedTask;
             }
         }
     }

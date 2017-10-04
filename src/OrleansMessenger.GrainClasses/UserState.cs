@@ -1,9 +1,8 @@
-﻿using Orleans;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace OrleansMessenger.GrainClasses
 {
-    public class UserState : GrainState
+    public class UserState 
     {
         public List<string> History { get; set; }
 
