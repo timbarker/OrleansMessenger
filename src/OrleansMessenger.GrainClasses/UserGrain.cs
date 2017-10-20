@@ -26,10 +26,8 @@ namespace OrleansMessenger.GrainClasses
 
         public async Task ReceiveMessage(string message, string from)
         {
-            var command = string.Format("m:{0}:{1}", from, message);
-
             RaiseEvent(new MessageReceived { From = from, Message = message });
-            await _clientMessageStream.OnNextAsync(command);
+            await _clientMessageStream.OnNextAsync($"{from}: {message}");
         }
 
         public async Task SendMessage(string message, string to)

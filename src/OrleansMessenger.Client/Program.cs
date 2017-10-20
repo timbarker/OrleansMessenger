@@ -8,7 +8,7 @@ namespace OrleansMessenger.Client
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             GrainClient.Initialize();
 
@@ -17,15 +17,19 @@ namespace OrleansMessenger.Client
 
             var userGrain = GrainClient.GrainFactory.GetGrain<IUserGrain>(user);
 
-            var subscription = GrainClient.GetStreamProvider("SMSProvider")
+            var subscription = await GrainClient.GetStreamProvider("SMSProvider")
                 .GetStream<string>(Guid.Parse("FED26B31-9D86-4F30-8128-01BA23880066"), user)
-                .SubscribeAsync(new IncommingMessageObserver())
-                .Result;
+                .SubscribeAsync(new IncommingMessageObserver());
 
-            foreach (var message in userGrain.GetHistoricalMessages(10).Result)
+            foreach (var message in await userGrain.GetHistoricalMessages(10))
             {
                 Console.WriteLine(message);
             }
+
+            Console.WriteLine("commands:");
+            Console.WriteLine("\tq - quit");
+            Console.WriteLine("\th - get historical messages");
+            Console.WriteLine("\ts:to:body - send a message");
 
             var command = "";
             while (true)
@@ -43,11 +47,11 @@ namespace OrleansMessenger.Client
                 if (command.StartsWith("s", StringComparison.Ordinal))
                 {
                     var commandArgs = command.Split(':');
-                    userGrain.SendMessage(commandArgs[2], commandArgs[1]);
+                    await userGrain.SendMessage(commandArgs[2], commandArgs[1]);
                 }
             }
 
-            subscription.UnsubscribeAsync().Wait();
+            await subscription.UnsubscribeAsync();
 
             GrainClient.Uninitialize();
         }
