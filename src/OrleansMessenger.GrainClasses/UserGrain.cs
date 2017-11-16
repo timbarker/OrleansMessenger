@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Orleans.Concurrency;
 using Orleans.EventSourcing;
+using Microsoft.Extensions.Logging;
 
 namespace OrleansMessenger.GrainClasses
 {
@@ -16,6 +17,12 @@ namespace OrleansMessenger.GrainClasses
     public class UserGrain : JournaledGrain<UserState, UserEvent>, IUserGrain
     {
         private IAsyncStream<string> _clientMessageStream;
+        private readonly ILogger<UserGrain> logger;
+
+        public UserGrain(ILogger<UserGrain> logger)
+        {
+            this.logger = logger;
+        }
 
         public override Task OnActivateAsync()
         {
@@ -26,12 +33,14 @@ namespace OrleansMessenger.GrainClasses
 
         public async Task ReceiveMessage(string message, string from)
         {
+            logger.LogInformation("Recevied message {message} from {from}", message, from);
             RaiseEvent(new MessageReceived { From = from, Message = message });
             await _clientMessageStream.OnNextAsync($"{from}: {message}");
         }
 
         public async Task SendMessage(string message, string to)
         {
+            logger.LogInformation("Sending message {message} to {to}", message, to);
             RaiseEvent(new MessageSent { To = to, Message = message });
 
             await GrainFactory.GetGrain<IUserGrain>(to)
