@@ -3,6 +3,7 @@ using Orleans.Streams;
 using OrleansMessenger.GrainInterfaces;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace OrleansMessenger.Client
 {
@@ -10,14 +11,20 @@ namespace OrleansMessenger.Client
     {
         static async Task Main(string[] args)
         {
-            GrainClient.Initialize();
+            var client = new ClientBuilder()
+                .LoadConfiguration()
+                .AddApplicationPart(typeof(IUserGrain).Assembly)
+                .ConfigureLogging(logging => logging.AddConsole())
+                .Build();
+
+            await client.Connect();
 
             Console.Write("Enter user name: ");
             var user = Console.ReadLine();
 
-            var userGrain = GrainClient.GrainFactory.GetGrain<IUserGrain>(user);
+            var userGrain = client.GetGrain<IUserGrain>(user);
 
-            var subscription = await GrainClient.GetStreamProvider("SMSProvider")
+            var subscription = await client.GetStreamProvider("SMSProvider")
                 .GetStream<string>(Guid.Parse("FED26B31-9D86-4F30-8128-01BA23880066"), user)
                 .SubscribeAsync(new IncommingMessageObserver());
 
@@ -53,7 +60,7 @@ namespace OrleansMessenger.Client
 
             await subscription.UnsubscribeAsync();
 
-            GrainClient.Uninitialize();
+            client.Dispose();
         }
 
         class IncommingMessageObserver : IAsyncObserver<string>
