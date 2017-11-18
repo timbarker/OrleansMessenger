@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Orleans.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace OrleansMessenger
 {
@@ -9,7 +10,6 @@ namespace OrleansMessenger
     {
         static async Task Main(string[] args)
         {
-
             var siloHost = new SiloHostBuilder()
                 .LoadClusterConfiguration()
                 .AddApplicationPart(typeof(Orleans.Providers.MemoryStreamProvider).Assembly)

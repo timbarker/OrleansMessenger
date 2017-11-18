@@ -17,8 +17,4 @@
     <ProjectReference Include="..\OrleansMessenger.GrainClasses\OrleansMessenger.GrainClasses.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="OrleansConfiguration.xml" CopyToOutputDirectory="Always" />
-  </ItemGroup>
-
 </Project>
