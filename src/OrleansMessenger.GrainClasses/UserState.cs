@@ -4,21 +4,23 @@ namespace OrleansMessenger.GrainClasses
 {
     public class UserState 
     {
-        public List<string> History { get; set; }
+        private readonly List<string> _history;
 
         public UserState()
         {
-            History = new List<string>();
+            _history = new List<string>();
         }
+
+        public IEnumerable<string> History => _history;
 
         public void Apply(MessageReceived @event)
         {
-            History.Add($"{@event.From}: {@event.Message}");
+            _history.Add($"{@event.From}: {@event.Message}");
         }
 
         public void Apply(MessageSent @event)
         {
-            History.Add($"{@event.To}: {@event.Message}");
+            _history.Add($"{@event.To}: {@event.Message}");
         }
     }
 }
